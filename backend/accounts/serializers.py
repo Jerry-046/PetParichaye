@@ -8,6 +8,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
+from django.core.exceptions import ValidationError
 
 # Serializer to handle User information
 class UserSerializer(serializers.ModelSerializer):
@@ -53,7 +54,6 @@ class LoginSerializer(serializers.Serializer):
             }
         raise serializers.ValidationError("Invalid credentials")  # Error for invalid credentials
 
-# Serializer to change the profile picture
 class ChangeProfilePictureSerializer(serializers.ModelSerializer):
     profile_picture = serializers.ImageField(required=True)
 
@@ -61,11 +61,29 @@ class ChangeProfilePictureSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['profile_picture']
 
+    def validate_profile_picture(self, value):
+        # Validate file type
+        if not value.content_type.startswith('image/'):
+            raise ValidationError("Uploaded file must be an image.")
+
+        # Validate file size (e.g., max 5MB)
+        max_size = 5 * 1024 * 1024  # 5MB
+        if value.size > max_size:
+            raise ValidationError(f"File size must not exceed {max_size / (1024 * 1024)} MB.")
+
+        return value
+
     def update(self, instance, validated_data):
+        # Handle existing profile picture cleanup
+        if instance.profile_picture:
+            instance.profile_picture.delete(save=False)
+
+        # Update with the new profile picture
         instance.profile_picture = validated_data.get('profile_picture', instance.profile_picture)
         instance.save()
         return instance
-
+    
+    
 User = get_user_model()
 
 class ResetPasswordSerializer(serializers.Serializer):

@@ -1,0 +1,29 @@
+/* Custom CSS for resizing and enhancing the logo in Jazzmin */
+
+/* Target the specific site logo inside the admin interface */
+#admin-logo #id_site_logo img {
+    max-width: 250px;  /* Set a maximum width for the logo */
+    width: 100%;  /* Make the logo responsive */
+    height: auto;  /* Keep the logo's aspect ratio */
+    margin: 20px auto;  /* Center the logo and add space around it */
+    display: block;  /* Ensure it behaves like a block element for centering */
+}
+
+/* For smaller screen sizes (e.g., tablets or mobile phones) */
+@media (max-width: 1024px) {
+    #admin-logo #id_site_logo img {
+        max-width: 200px;  /* Slightly smaller logo for tablets */
+    }
+}
+
+@media (max-width: 768px) {
+    #admin-logo #id_site_logo img {
+        max-width: 150px;  /* Further reduce the size for small screens */
+    }
+}
+
+@media (max-width: 480px) {
+    #admin-logo #id_site_logo img {
+        max-width: 130px;  /* Even smaller logo on very small screens */
+    }
+}

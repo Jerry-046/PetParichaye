@@ -1,49 +1,42 @@
-from rest_framework.views import APIView
+from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
+from .models import Pet, MedicalReport
+from .serializers import PetSerializer, MedicalReportSerializer
+from rest_framework import status
+from django.shortcuts import render, get_object_or_404
 from .models import Pet
-from .serializers import PetSerializer
 
-class PetListView(APIView):
-    permission_classes = [IsAuthenticated]
+def pet_profile(request, pet_id):
+    # Get the pet object or return 404 if it doesn't exist
+    pet = get_object_or_404(Pet, id=pet_id)
+    return render(request, 'pet_profile.html', {'pet': pet})
 
-    def get(self, request):
-        pets = Pet.objects.filter(owner=request.user)
-        serializer = PetSerializer(pets, many=True)
-        return Response(serializer.data)
+class PetViewSet(viewsets.ModelViewSet):
+    queryset = Pet.objects.all()
+    serializer_class = PetSerializer
 
-    def post(self, request):
-        data = request.data.copy()
-        data["owner"] = request.user.id
-        serializer = PetSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+    @action(detail=True, methods=['get'])
+    def qr_code(self, request, pk=None):
+        pet = self.get_object()
+        return Response({
+            "qr_code_url": pet.qr_code.url
+        })
 
-class PetDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+class MedicalReportViewSet(viewsets.ModelViewSet):
+    queryset = MedicalReport.objects.all()
+    serializer_class = MedicalReportSerializer
 
-    def get(self, request, pk):
-        pet = Pet.objects.filter(pk=pk, owner=request.user).first()
-        if not pet:
-            return Response({"error": "Pet not found"}, status=404)
-        serializer = PetSerializer(pet)
-        return Response(serializer.data)
+    def create(self, request, *args, **kwargs):
+        pet_id = request.data.get('pet')
+        pet = Pet.objects.get(id=pet_id)
+        report_image = request.data.get('report_image')
+        description = request.data.get('description')
 
-    def put(self, request, pk):
-        pet = Pet.objects.filter(pk=pk, owner=request.user).first()
-        if not pet:
-            return Response({"error": "Pet not found"}, status=404)
-        serializer = PetSerializer(pet, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
+        report = MedicalReport.objects.create(
+            pet=pet,
+            report_image=report_image,
+            description=description
+        )
 
-    def delete(self, request, pk):
-        pet = Pet.objects.filter(pk=pk, owner=request.user).first()
-        if not pet:
-            return Response({"error": "Pet not found"}, status=404)
-        pet.delete()
-        return Response({"message": "Pet deleted successfully"}, status=200)
+        return Response(self.get_serializer(report).data, status=status.HTTP_201_CREATED)

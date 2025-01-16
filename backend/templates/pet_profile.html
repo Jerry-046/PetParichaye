@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ pet.name }} - Pet Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 1rem 2rem;
+            text-align: center;
+        }
+        main {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        .profile-picture, .qr-code {
+            display: block;
+            margin: 1rem auto;
+        }
+        .photos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .photos img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        p {
+            margin: 0.5rem 0;
+        }
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>{{ pet.name }}'s Profile</h1>
+    </header>
+    <main>
+        {% if pet.profile_picture %}
+            <img src="{{ pet.profile_picture.url }}" alt="{{ pet.name }}'s Profile Picture" class="profile-picture" style="max-width: 300px;">
+        {% else %}
+            <span>No profile picture available</span>
+        {% endif %}
+         <p><strong>Owner:</strong> {{ pet.owner.first_name }}</p>
+
+        <p><strong>Breed:</strong> {{ pet.breed }}</p>
+        <p><strong>Age:</strong> {{ pet.age }} years</p>
+
+        <h2>Photos</h2>
+        <div class="photos">
+            {% for photo in pet.photos.all %}
+                <img src="{{ photo.image.url }}" alt="Photo {{ photo.id }}">
+            {% endfor %}
+        </div>
+
+        <p><strong>Owner:</strong> {{ pet.owner.first_name }}</p>
+    </main>
+    <footer>
+        &copy; {{ current_year }} Pet Details App
+    </footer>
+</body>
+</html>
