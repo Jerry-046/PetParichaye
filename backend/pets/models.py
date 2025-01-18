@@ -6,13 +6,21 @@ import qrcode
 from io import BytesIO
 from accounts.models import CustomUser
 
+class MedicalReport(models.Model):
+    pet = models.ForeignKey('Pet', on_delete=models.CASCADE, related_name="medical_reports")
+    report_image = models.ImageField(upload_to="medical_reports/", blank=True, null=True)
+    report_description = models.TextField(blank=True, null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Medical Report for {self.pet.name}"
+
 class Pet(models.Model):
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="pets")
     name = models.CharField(max_length=50)
     breed = models.CharField(max_length=50)
     age = models.PositiveIntegerField()
     profile_picture = models.ImageField(upload_to="profile_pics/pets/", blank=True, null=True)
-    medical_reports = models.ManyToManyField('MedicalReport', blank=True, related_name='pets')
     qr_code = models.ImageField(upload_to="qr_codes/", blank=True, null=True)
 
     def __str__(self):
@@ -45,10 +53,4 @@ def generate_qr_code(sender, instance, created, **kwargs):
         instance.qr_code.save(f"qr_code_{instance.id}.png", File(qr_code_io), save=True)
 
 
-class MedicalReport(models.Model):
-    pet = models.ForeignKey(Pet, related_name="reports", on_delete=models.CASCADE)
-    report_image = models.ImageField(upload_to="medical_reports/")
-    description = models.TextField()
 
-    def __str__(self):
-        return f"Medical Report for {self.pet.name}"

@@ -23,20 +23,3 @@ class PetViewSet(viewsets.ModelViewSet):
             "qr_code_url": pet.qr_code.url
         })
 
-class MedicalReportViewSet(viewsets.ModelViewSet):
-    queryset = MedicalReport.objects.all()
-    serializer_class = MedicalReportSerializer
-
-    def create(self, request, *args, **kwargs):
-        pet_id = request.data.get('pet')
-        pet = Pet.objects.get(id=pet_id)
-        report_image = request.data.get('report_image')
-        description = request.data.get('description')
-
-        report = MedicalReport.objects.create(
-            pet=pet,
-            report_image=report_image,
-            description=description
-        )
-
-        return Response(self.get_serializer(report).data, status=status.HTTP_201_CREATED)
