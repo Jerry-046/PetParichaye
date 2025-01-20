@@ -172,3 +172,14 @@ class ConfirmPasswordSerializer(serializers.Serializer):
         user.set_password(new_password)
         user.save()
         return {"message": "Password has been reset successfully."}
+    
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['email', 'first_name', 'last_name', 'address', 'bio', 'profile_picture']
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', 'last_name', 'address', 'bio', 'profile_picture']

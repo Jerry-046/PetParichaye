@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import CustomUser
-from .serializers import RegisterSerializer, LoginSerializer,ResetPasswordSerializer,ConfirmPasswordSerializer,ChangeProfilePictureSerializer
+from .serializers import RegisterSerializer, LoginSerializer,ResetPasswordSerializer,ConfirmPasswordSerializer,ChangeProfilePictureSerializer,UpdateProfileSerializer,UserProfileSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
@@ -82,4 +82,24 @@ class ChangeProfilePictureView(APIView):
                 "profile_picture": user.profile_picture.url  # Return the new picture URL for React
             }, status=status.HTTP_200_OK)
 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        serializer = UserProfileSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class UpdateProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        user = request.user
+        serializer = UpdateProfileSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Profile updated successfully."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
