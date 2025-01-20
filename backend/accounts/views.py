@@ -2,16 +2,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
-from .models import CustomUser
 from .serializers import RegisterSerializer, LoginSerializer,ResetPasswordSerializer,ConfirmPasswordSerializer,ChangeProfilePictureSerializer,UpdateProfileSerializer,UserProfileSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.core.mail import send_mail
-from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.contrib.auth import get_user_model
 from rest_framework import status
-from django.contrib.auth import update_session_auth_hash
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status, permissions
 

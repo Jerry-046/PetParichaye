@@ -1,15 +1,9 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import PetViewSet, pet_profile
-
-# Create a router and register the PetViewSet
-router = DefaultRouter()
-router.register(r'pets', PetViewSet)
+from django.urls import path
+from .views import PetCreateView, PetProfileView, PetProfileUpdateView, PetDeleteView
 
 urlpatterns = [
-    # API URLs for PetViewSet
-    path('api/', include(router.urls)),
-    
-    # URL for pet profile page
-    path('pets/<int:pet_id>/profile/', pet_profile, name='pet_profile'),
+    path('create/', PetCreateView.as_view(), name='create-pet'),
+    path('<int:pk>/profile/', PetProfileView.as_view(), name='view-pet-profile'),
+    path('<int:pk>/update/', PetProfileUpdateView.as_view(), name='update-pet'),
+    path('<int:pk>/delete/', PetDeleteView.as_view(), name='delete-pet'),
 ]

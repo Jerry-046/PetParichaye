@@ -5,17 +5,9 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_decode,urlsafe_base64_encode
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.core.exceptions import ValidationError
-
-# Serializer to handle User information
-class UserSerializer(serializers.ModelSerializer):
-    # Including the profile_picture in the response
-    class Meta:
-        model = CustomUser
-        fields = ["id", "email", "first_name", "last_name", "address", "bio", "profile_picture"]
 
 # Serializer to register a new user
 class RegisterSerializer(serializers.ModelSerializer):
@@ -50,7 +42,7 @@ class LoginSerializer(serializers.Serializer):
             return {
                 "refresh": str(refresh),  # Refresh token for refreshing access token
                 "access": str(refresh.access_token),  # Access token for authentication
-                "user": UserSerializer(user).data,  # Return user details
+                "user": UserProfileSerializer(user).data,  # Return user details
             }
         raise serializers.ValidationError("Invalid credentials")  # Error for invalid credentials
 
